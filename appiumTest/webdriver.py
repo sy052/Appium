@@ -1,0 +1,46 @@
+from appium import webdriver
+from appium.options.common.base import AppiumOptions
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+options = AppiumOptions()
+options.load_capabilities({
+   "appium:automationName": "UiAutomator2",
+   "appium:platformName": "Android",
+   "appium:deviceName": "emulator-5554",
+   "appium:platformVersion": "14",
+   "appium:settings[enableMultiWindows]": True,
+   "appium:wdaLocalPort": "8100",
+   "appium:settings[allowInvisibleElements]": True,
+   "appium:connectHardwareKeyboard": True,
+})
+
+#Appium 서버 연결
+print("Appium 서버 연결 시도중...")
+try:
+    driver = webdriver.Remote("http://127.0.0.1:4723", options=options)
+    print("Appium 서버 연결 성공!")
+
+except Exception as e:
+    print(f"Appium 서버 연결 실패: {e}")
+    exit(1)
+
+#요소 대기 및 클릭
+try:
+    element_id = '//android.widget.TextView[@content-desc="YouTube"]'
+    print(f"요소 '{element_id}' 대기중...")
+    element = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, element_id))
+    ) 
+    print("요소를 찾았습니다! 클릭 시도 중...")
+
+    element.click()
+
+    print("클릭 성공!")
+
+except TimeoutException:
+    print("요소를 찾는 데 시간이 초과되었습니다.")
+except Exception as e:
+    print(f"클릭 중 오류 발생:{e}")
